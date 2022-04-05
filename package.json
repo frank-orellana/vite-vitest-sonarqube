@@ -7,7 +7,8 @@
     "build": "vue-tsc --noEmit && vite build",
     "preview": "vite preview",
     "test": "vitest",
-    "coverage": "vitest run --coverage"
+    "coverage": "vitest run --coverage",
+    "sonar": "pnpm coverage && npx sonar-scanner -Dsonar.login=%SONAR_LOGIN%"
   },
   "dependencies": {
     "vue": "^3.2.25"

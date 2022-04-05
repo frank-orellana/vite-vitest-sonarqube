@@ -1,11 +1,71 @@
-# Vue 3 + Typescript + Vite
+# TL;DR instructions
+### Create a vite project, add vitest
+```bash
+pnpm create vite
+pnpm i vitest -D
+```
+### Add scripts to package.json
+```json
+"test": "vitest",
+"coverage": "vitest run --coverage",
+"sonar": "pnpm coverage && npx sonar-scanner -Dsonar.login=$SONAR"
+# In windows %SONAR% instead of $SONAR
+```
 
-This template should help get you started developing with Vue 3 and Typescript in Vite. The template uses Vue 3 `<script setup>` SFCs, check out the [script setup docs](https://v3.vuejs.org/api/sfc-script-setup.html#sfc-script-setup) to learn more.
+### Create a unit test file:
+```ts
+// src/test/App.test.ts
+import App from '../App.vue'
+import { test, expect } from 'vitest';
+test('first test', () => {
+  expect(App).toBeTruthy()
+})
+```
+### Run the tests and coverage if you want now
+```bash
+pnpm test
+pnpm coverage
+```
+### Add the coverage folder to `.gitignore`
+```
+coverage
+```
 
-## Recommended IDE Setup
+## Configure Sonarqube
+Create a project in sonarqube, remember the project key and the token
+### Add a sonar-project.properties file, set your projecKey and url 
+```
+sonar.projectKey=vite-vitest-sonarqube
+sonar.sources=src/
+sonar.javascript.lcov.reportPaths=coverage/lcov.info
+sonar.exclusions=dist/**
+sonar.coverage.exclusions=**/*.test.*
+host.url=http://localhost:9000
+```
 
-- [VSCode](https://code.visualstudio.com/) + [Volar](https://marketplace.visualstudio.com/items?itemName=johnsoncodehk.volar)
-
-## Type Support For `.vue` Imports in TS
-
-Since TypeScript cannot handle type information for `.vue` imports, they are shimmed to be a generic Vue component type by default. In most cases this is fine if you don't really care about component prop types outside of templates. However, if you wish to get actual prop types in `.vue` imports (for example to get props validation when using manual `h(...)` calls), you can enable Volar's `.vue` type support plugin by running `Volar: Switch TS Plugin on/off` from VSCode command palette.
+### Install sonar-scanner if not already installed
+```bash
+pnpm i sonar-scanner -D
+```
+### Configure vitest to generate lcov.info files in vitest.config.ts
+```ts
+import { defineConfig } from 'vite'
+import Vue from '@vitejs/plugin-vue'
+export default defineConfig({
+  plugins: [
+    Vue(),
+  ],
+  test: {
+    coverage: {
+      reporter: ['text', 'lcov']
+    }
+  },
+})
+```
+### Run coverage and the scan, use your generated token
+```bash
+pnpm sonar
+# or
+npx sonar-scanner -Dsonar.login=<your_token>
+```
+### Go to your Sonarqube server and look at the report!
